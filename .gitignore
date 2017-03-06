@@ -1,6 +1,5 @@
 *~
 node_modules
-ixp.all.js
-zz.js
 *.log
+dist/
 
