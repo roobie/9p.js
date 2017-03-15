@@ -14,5 +14,5 @@ function decode(x) {
 }
 
 // re: WIRE_FORMAT
-var dataTransferEncoding = exports.dataTransferEncoding = 'utf-8';
-var httpContentType = exports.httpContentType = 'application/json';
+const dataTransferEncoding = exports.dataTransferEncoding = 'utf-8';
+const httpContentType = exports.httpContentType = 'application/json';

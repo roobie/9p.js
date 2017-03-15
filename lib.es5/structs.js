@@ -25,8 +25,8 @@ function getStructProto() {
 }
 
 function Rversion(packet) {
-  var msize = (0, _utf8ByteLength2.default)(packet.version);
-  var struct = getStructProto().word32Ule('msize').chars('version', msize, 'utf-8').allocate();
+  const msize = (0, _utf8ByteLength2.default)(packet.version);
+  const struct = getStructProto().word32Ule('msize').chars('version', msize, 'utf-8').allocate();
 
   struct.set('size', struct.length());
   struct.set('type', _protocol_data.packetType.Rversion);
@@ -38,9 +38,9 @@ function Rversion(packet) {
 }
 
 function Tversion(tag, version) {
-  var struct = Rversion({
-    tag: tag,
-    version: version
+  const struct = Rversion({
+    tag,
+    version
   });
   struct.fields.type = _protocol_data.packetType.Tversion;
 
@@ -48,8 +48,16 @@ function Tversion(tag, version) {
 }
 
 function Qid(qid) {
-  void '\ntypedef\nstruct Qid\n{\n  uvlong path;\n  ulong  vers;\n  uchar  type;\n} Qid;\n';
-  var struct = (0, _struct2.default)().word8('type').word32Ule('version').word64Ule('path').allocate();
+  void `
+typedef
+struct Qid
+{
+  uvlong path;
+  ulong  vers;
+  uchar  type;
+} Qid;
+`;
+  const struct = (0, _struct2.default)().word8('type').word32Ule('version').word64Ule('path').allocate();
 
   struct.set('type', qid.type);
   struct.set('version', qid.version);
@@ -59,7 +67,29 @@ function Qid(qid) {
 }
 
 function Dir(name, uid, gid, muid) {
-  void '\ntypedef\nstruct Dir {\n   /* system-modified data */\n  ushort  type; /* server type */\n  uint  dev;  /* server subtype */\n  /* file data */\n  Qid qid;  /* unique id from server */\n  ulong mode; /* permissions */\n  ulong atime;  /* last read time */\n  ulong mtime;  /* last write time */\n  vlong length; /* file length */\n  char  *name;  /* last element of path */\n  char  *uid; /* owner name */\n  char  *gid; /* group name */\n  char  *muid;  /* last modifier name */\n\n  /* 9P2000.u extensions */\n  uint  uidnum;   /* numeric uid */\n  uint  gidnum;   /* numeric gid */\n  uint  muidnum;  /* numeric muid */\n  char  *ext;   /* extended info */\n} Dir;';
+  void `
+typedef
+struct Dir {
+   /* system-modified data */
+  ushort  type; /* server type */
+  uint  dev;  /* server subtype */
+  /* file data */
+  Qid qid;  /* unique id from server */
+  ulong mode; /* permissions */
+  ulong atime;  /* last read time */
+  ulong mtime;  /* last write time */
+  vlong length; /* file length */
+  char  *name;  /* last element of path */
+  char  *uid; /* owner name */
+  char  *gid; /* group name */
+  char  *muid;  /* last modifier name */
+
+  /* 9P2000.u extensions */
+  uint  uidnum;   /* numeric uid */
+  uint  gidnum;   /* numeric gid */
+  uint  muidnum;  /* numeric muid */
+  char  *ext;   /* extended info */
+} Dir;`;
 
   return (0, _struct2.default)().word32Sle('status').word8('type').word32Ule('dev').struct('qid', Qid()).word32Ule('mode').word32Ule('atime').word32Ule('mtime').word64Ule('length')
 
@@ -69,9 +99,9 @@ function Dir(name, uid, gid, muid) {
 
 function byteLength(str) {
   /// returns the byte length of an utf8 string
-  var s = str.length;
-  for (var i = str.length - 1; i >= 0; i--) {
-    var code = str.charCodeAt(i);
+  let s = str.length;
+  for (let i = str.length - 1; i >= 0; i--) {
+    const code = str.charCodeAt(i);
     if (code > 0x7f && code <= 0x7ff) s++;else if (code > 0x7ff && code <= 0xffff) s += 2;
     if (code >= 0xDC00 && code <= 0xDFFF) i--; // trail surrogate
   }

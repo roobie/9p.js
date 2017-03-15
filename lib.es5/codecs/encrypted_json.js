@@ -20,24 +20,24 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * NOT SAFE (as in, not verified to be safe)
  */
 
-var dataTransferEncoding = exports.dataTransferEncoding = null;
-var httpContentType = exports.httpContentType = 'application/octet-stream';
+const dataTransferEncoding = exports.dataTransferEncoding = null;
+const httpContentType = exports.httpContentType = 'application/octet-stream';
 
 // data format
-var dataEncoding = 'utf8';
+const dataEncoding = 'utf8';
 function encode(plainObject) {
-  var plainText = JSON.stringify(plainObject);
+  const plainText = JSON.stringify(plainObject);
   return encrypt(plainText);
 }
 
 function decode(cipherBuffer) {
-  var json = decrypt(cipherBuffer);
+  const json = decrypt(cipherBuffer);
   return JSON.parse(json);
 }
 
 // Load your secret key from a safe place and reuse it across multiple
 // secretbox calls.
-var secret = _libsodiumWrappers2.default.crypto_generichash(_libsodiumWrappers2.default.crypto_box_PUBLICKEYBYTES, 'secret');
+const secret = _libsodiumWrappers2.default.crypto_generichash(_libsodiumWrappers2.default.crypto_box_PUBLICKEYBYTES, 'secret');
 
 // Given a message as a string, return a Buffer containing the
 // nonce (in the first 24 bytes) and the encrypted content.

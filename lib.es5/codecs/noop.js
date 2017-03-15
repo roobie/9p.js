@@ -13,4 +13,4 @@ function decode(x) {
   return x;
 }
 
-var dataTransferEncoding = exports.dataTransferEncoding = null;
+const dataTransferEncoding = exports.dataTransferEncoding = null;

@@ -21,13 +21,13 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * This is a binary format, so we want the data to be
  * transmitted and received in raw binary
  */
-var dataTransferEncoding = exports.dataTransferEncoding = null;
+const dataTransferEncoding = exports.dataTransferEncoding = null;
 
 /**
  * When transported via HTTP, the client should handle the response
  * as raw binary data.
  */
-var httpContentType = exports.httpContentType = 'application/octet-stream';
+const httpContentType = exports.httpContentType = 'application/octet-stream';
 
 function encode(packet) {
   if (packet.type in handlersR) {
@@ -43,43 +43,37 @@ function encode(packet) {
  * @returns the internal representation of the data
  */
 function decode(buffer) {
-  var offset = 0;
-  var size = buffer.slice(offset, _protocol_data.fieldSizes.size).readUInt32LE();
+  let offset = 0;
+  const size = buffer.slice(offset, _protocol_data.fieldSizes.size).readUInt32LE();
   offset = _protocol_data.fieldSizes.size;
-  var type = buffer.slice(offset, offset + _protocol_data.fieldSizes.type).readInt8();
+  const type = buffer.slice(offset, offset + _protocol_data.fieldSizes.type).readInt8();
   offset = _protocol_data.fieldSizes.size + _protocol_data.fieldSizes.type;
 
-  var handler = handlersT[type];
+  const handler = handlersT[type];
   if (type in handlersT) {
     return handler(size, buffer.slice(offset));
   }
 
   throw new Error('not implemented');
 }
-var handlersR = {
+const handlersR = {
   101: function RversionHandler(packet) {
     return (0, _structs.Rversion)(packet).buffer();
   }
 };
 
-var handlersT = {
+const handlersT = {
   100: function TversionHandler(size, buffer) {
     // Since we don't know how long the `version` string is, we need to eat the buffer
     // byte by byte, until we get to the `msize` data, which tells us how long the string
     // is, which is why we're not using `Struct` here.
-    var minimumSize = _protocol_data.fieldSizes.tag + _protocol_data.fieldSizes.msize;
-    (0, _assert2.default)(size >= minimumSize, 'Must be at least ' + minimumSize + ' bytes');
+    const minimumSize = _protocol_data.fieldSizes.tag + _protocol_data.fieldSizes.msize;
+    (0, _assert2.default)(size >= minimumSize, `Must be at least ${minimumSize} bytes`);
 
-    var data = bufferReader(buffer).consume(_protocol_data.fieldSizes.tag, 'tag', function (data) {
-      return data.readUInt16LE();
-    }).consume(_protocol_data.fieldSizes.msize, 'msize', function (data) {
-      return data.readUInt32LE();
-    }).consume(-1, 'version', function (data) {
-      return data.utf8Slice();
-    }).done();
+    const data = bufferReader(buffer).consume(_protocol_data.fieldSizes.tag, 'tag', data => data.readUInt16LE()).consume(_protocol_data.fieldSizes.msize, 'msize', data => data.readUInt32LE()).consume(-1, 'version', data => data.utf8Slice()).done();
 
     return {
-      size: size,
+      size,
       type: _protocol_data.packetType.Tversion,
       tag: data.tag,
       msize: data.msize,
@@ -89,12 +83,12 @@ var handlersT = {
 };
 
 function bufferReader(buffer) {
-  var offset = 0;
-  var acc = {};
+  let offset = 0;
+  const acc = {};
 
   return {
-    consume: function consume(nbytes, name, callback) {
-      var result = null;
+    consume: function (nbytes, name, callback) {
+      let result = null;
       if (nbytes === -1) {
         result = buffer.slice(offset);
       } else {
@@ -104,7 +98,7 @@ function bufferReader(buffer) {
       acc[name] = callback(result);
       return this;
     },
-    done: function done() {
+    done: function () {
       return acc;
     }
   };

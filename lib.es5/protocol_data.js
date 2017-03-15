@@ -3,27 +3,59 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+const specification = `
+size[4] Tversion tag[2] msize[4] version[s]
+size[4] Rversion tag[2] msize[4] version[s]
 
-function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+size[4] Tauth tag[2] afid[4] uname[s] aname[s]
+size[4] Rauth tag[2] aqid[13]
 
-var specification = '\nsize[4] Tversion tag[2] msize[4] version[s]\nsize[4] Rversion tag[2] msize[4] version[s]\n\nsize[4] Tauth tag[2] afid[4] uname[s] aname[s]\nsize[4] Rauth tag[2] aqid[13]\n\nsize[4] Rerror tag[2] ename[s]\n\nsize[4] Tflush tag[2] oldtag[2]\nsize[4] Rflush tag[2]\n\nsize[4] Tattach tag[2] fid[4] afid[4] uname[s] aname[s]\nsize[4] Rattach tag[2] qid[13]\n\nsize[4] Twalk tag[2] fid[4] newfid[4] nwname[2] nwname*(wname[s])\nsize[4] Rwalk tag[2] nwqid[2] nwqid*(wqid[13])\n\nsize[4] Topen tag[2] fid[4] mode[1]\nsize[4] Ropen tag[2] qid[13] iounit[4]\n\nsize[4] Tcreate tag[2] fid[4] name[s] perm[4] mode[1]\nsize[4] Rcreate tag[2] qid[13] iounit[4]\n\nsize[4] Tread tag[2] fid[4] offset[8] count[4]\nsize[4] Rread tag[2] count[4] data[count]\n\nsize[4] Twrite tag[2] fid[4] offset[8] count[4] data[count]\nsize[4] Rwrite tag[2] count[4]\n\nsize[4] Tclunk tag[2] fid[4]\nsize[4] Rclunk tag[2]\n\nsize[4] Tremove tag[2] fid[4]\nsize[4] Rremove tag[2]\n\nsize[4] Tstat tag[2] fid[4]\nsize[4] Rstat tag[2] stat[n]\n\nsize[4] Twstat tag[2] fid[4] stat[n]\nsize[4] Rwstat tag[2]\n';
+size[4] Rerror tag[2] ename[s]
 
-var specificationLines = specification.split('\n').filter(function (x) {
-  return !!x;
-});
+size[4] Tflush tag[2] oldtag[2]
+size[4] Rflush tag[2]
 
-var fieldSizes = exports.fieldSizes = function () {
-  var lines = specificationLines;
-  var result = {};
+size[4] Tattach tag[2] fid[4] afid[4] uname[s] aname[s]
+size[4] Rattach tag[2] qid[13]
 
-  lines.filter(function (x) {
-    return !!x;
-  }).forEach(function (line) {
-    var fields = line.trim().split(' ');
-    fields.filter(function (fld) {
-      return fld.includes(']') && !fld.includes('*');
-    }).map(parseField).forEach(function (spec) {
-      var asInt = parseInt(spec.size, 10);
+size[4] Twalk tag[2] fid[4] newfid[4] nwname[2] nwname*(wname[s])
+size[4] Rwalk tag[2] nwqid[2] nwqid*(wqid[13])
+
+size[4] Topen tag[2] fid[4] mode[1]
+size[4] Ropen tag[2] qid[13] iounit[4]
+
+size[4] Tcreate tag[2] fid[4] name[s] perm[4] mode[1]
+size[4] Rcreate tag[2] qid[13] iounit[4]
+
+size[4] Tread tag[2] fid[4] offset[8] count[4]
+size[4] Rread tag[2] count[4] data[count]
+
+size[4] Twrite tag[2] fid[4] offset[8] count[4] data[count]
+size[4] Rwrite tag[2] count[4]
+
+size[4] Tclunk tag[2] fid[4]
+size[4] Rclunk tag[2]
+
+size[4] Tremove tag[2] fid[4]
+size[4] Rremove tag[2]
+
+size[4] Tstat tag[2] fid[4]
+size[4] Rstat tag[2] stat[n]
+
+size[4] Twstat tag[2] fid[4] stat[n]
+size[4] Rwstat tag[2]
+`;
+
+const specificationLines = specification.split('\n').filter(x => !!x);
+
+const fieldSizes = exports.fieldSizes = function () {
+  const lines = specificationLines;
+  const result = {};
+
+  lines.filter(x => !!x).forEach(line => {
+    const fields = line.trim().split(' ');
+    fields.filter(fld => fld.includes(']') && !fld.includes('*')).map(parseField).forEach(spec => {
+      const asInt = parseInt(spec.size, 10);
       if (isNaN(asInt)) {
         result[spec.name] = spec.size;
       } else {
@@ -38,26 +70,26 @@ var fieldSizes = exports.fieldSizes = function () {
   return result;
 }();
 
-var packetSpecs = exports.packetSpecs = function () {
-  var lines = specificationLines;
-  return lines.reduce(function (acc, line) {
-    var fields = line.trim().split(' ');
+const packetSpecs = exports.packetSpecs = function () {
+  const lines = specificationLines;
+  return lines.reduce((acc, line) => {
+    const fields = line.trim().split(' ');
 
-    var size = parseField(fields[0]);
-    var typeName = fields[1];
-    var type = {
+    const size = parseField(fields[0]);
+    const typeName = fields[1];
+    const type = {
       size: 1,
       name: typeName
     };
 
-    acc[typeName] = [size, type].concat(_toConsumableArray(fields.slice(2).map(parseField)));
+    acc[typeName] = [size, type, ...fields.slice(2).map(parseField)];
 
     return acc;
   }, {});
 }();
 
 function parseField(fld) {
-  var parts = fld.replace(']', '').split('[');
+  const parts = fld.replace(']', '').split('[');
   return {
     name: parts[0],
     size: parts[1]
@@ -68,7 +100,7 @@ function parseField(fld) {
  * A mapping for name{string} -> type{int}
  * E.g. packetType.Rerror // => 107
  */
-var packetType = exports.packetType = {
+const packetType = exports.packetType = {
   Tversion: 100,
   Rversion: 101,
   Tauth: 102,
@@ -103,9 +135,9 @@ var packetType = exports.packetType = {
   Ropenfd: 99
 };
 
-var packets = exports.packets = function () {
-  var result = [];
-  for (var typeName in packetType) {
+const packets = exports.packets = function () {
+  const result = [];
+  for (let typeName in packetType) {
     result[packetType[typeName]] = typeName;
   }
 
